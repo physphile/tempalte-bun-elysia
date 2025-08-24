@@ -1,0 +1,358 @@
+diff --git a/dist/plugins/open-api/index.mjs b/dist/plugins/open-api/index.mjs
+index 2f4eba1bf1ade7e81f4fba351744ccaa601d5434..fa77966713bce6d58362c17fcce37f3fd9682a7f 100644
+--- a/dist/plugins/open-api/index.mjs
++++ b/dist/plugins/open-api/index.mjs
+@@ -60,12 +60,12 @@ function getFieldSchema(field) {
+ }
+ function getParameters(options) {
+   const parameters = [];
+-  if (options.metadata?.openapi?.parameters) {
+-    parameters.push(...options.metadata.openapi.parameters);
++  if (options?.metadata?.openapi?.parameters) {
++    parameters.push(...options?.metadata.openapi.parameters);
+     return parameters;
+   }
+-  if (options.query instanceof ZodObject) {
+-    Object.entries(options.query.shape).forEach(([key, value]) => {
++  if (options?.query instanceof ZodObject) {
++    Object.entries(options?.query.shape).forEach(([key, value]) => {
+       if (value instanceof ZodType) {
+         parameters.push({
+           name: key,
+@@ -84,12 +84,12 @@ function getParameters(options) {
+   return parameters;
+ }
+ function getRequestBody(options) {
+-  if (options.metadata?.openapi?.requestBody) {
+-    return options.metadata.openapi.requestBody;
++  if (options?.metadata?.openapi?.requestBody) {
++    return options?.metadata.openapi.requestBody;
+   }
+-  if (!options.body) return void 0;
+-  if (options.body instanceof ZodObject || options.body instanceof ZodOptional) {
+-    const shape = options.body.shape;
++  if (!options?.body) return void 0;
++  if (options?.body instanceof ZodObject || options?.body instanceof ZodOptional) {
++    const shape = options?.body.shape;
+     if (!shape) return void 0;
+     const properties = {};
+     const required = [];
+@@ -105,7 +105,7 @@ function getRequestBody(options) {
+       }
+     });
+     return {
+-      required: options.body instanceof ZodOptional ? false : options.body ? true : false,
++      required: options?.body instanceof ZodOptional ? false : options?.body ? true : false,
+       content: {
+         "application/json": {
+           schema: {
+@@ -253,7 +253,7 @@ async function generator(ctx, options) {
+   };
+   const paths = {};
+   Object.entries(baseEndpoints.api).forEach(([_, value]) => {
+-    if (ctx.options.disabledPaths?.includes(value.path)) return;
++    if (ctx.options?.disabledPaths?.includes(value.path)) return;
+     const options2 = value.options;
+     if (options2.metadata?.SERVER_ONLY) return;
+     const path = toOpenApiPath(value.path);
+@@ -304,7 +304,7 @@ async function generator(ctx, options) {
+       };
+     }
+   });
+-  for (const plugin of options.plugins || []) {
++  for (const plugin of options?.plugins || []) {
+     if (plugin.id === "open-api") {
+       continue;
+     }
+@@ -319,7 +319,7 @@ async function generator(ctx, options) {
+       return null;
+     }).filter((x) => x !== null);
+     Object.entries(api).forEach(([key, value]) => {
+-      if (ctx.options.disabledPaths?.includes(value.path)) return;
++      if (ctx.options?.disabledPaths?.includes(value.path)) return;
+       const options2 = value.options;
+       if (options2.metadata?.SERVER_ONLY) return;
+       const path = toOpenApiPath(value.path);
+diff --git a/dist/shared/better-auth.DORkW_Ge.mjs b/dist/shared/better-auth.DORkW_Ge.mjs
+index 7c116e184430a711ee4f3743058224205f10ca76..07a1c503a65e5a0af553b769da8199c8fe1b9c33 100644
+--- a/dist/shared/better-auth.DORkW_Ge.mjs
++++ b/dist/shared/better-auth.DORkW_Ge.mjs
+@@ -1,5 +1,5 @@
+ const getAuthTables = (options) => {
+-  const pluginSchema = options.plugins?.reduce(
++  const pluginSchema = options?.plugins?.reduce(
+     (acc, plugin) => {
+       const schema = plugin.schema;
+       if (!schema) return acc;
+@@ -16,23 +16,23 @@ const getAuthTables = (options) => {
+     },
+     {}
+   );
+-  const shouldAddRateLimitTable = options.rateLimit?.storage === "database";
++  const shouldAddRateLimitTable = options?.rateLimit?.storage === "database";
+   const rateLimitTable = {
+     rateLimit: {
+-      modelName: options.rateLimit?.modelName || "rateLimit",
++      modelName: options?.rateLimit?.modelName || "rateLimit",
+       fields: {
+         key: {
+           type: "string",
+-          fieldName: options.rateLimit?.fields?.key || "key"
++          fieldName: options?.rateLimit?.fields?.key || "key"
+         },
+         count: {
+           type: "number",
+-          fieldName: options.rateLimit?.fields?.count || "count"
++          fieldName: options?.rateLimit?.fields?.count || "count"
+         },
+         lastRequest: {
+           type: "number",
+           bigint: true,
+-          fieldName: options.rateLimit?.fields?.lastRequest || "lastRequest"
++          fieldName: options?.rateLimit?.fields?.lastRequest || "lastRequest"
+         }
+       }
+     }
+@@ -40,203 +40,203 @@ const getAuthTables = (options) => {
+   const { user, session, account, ...pluginTables } = pluginSchema || {};
+   const sessionTable = {
+     session: {
+-      modelName: options.session?.modelName || "session",
++      modelName: options?.session?.modelName || "session",
+       fields: {
+         expiresAt: {
+           type: "date",
+           required: true,
+-          fieldName: options.session?.fields?.expiresAt || "expiresAt"
++          fieldName: options?.session?.fields?.expiresAt || "expiresAt"
+         },
+         token: {
+           type: "string",
+           required: true,
+-          fieldName: options.session?.fields?.token || "token",
++          fieldName: options?.session?.fields?.token || "token",
+           unique: true
+         },
+         createdAt: {
+           type: "date",
+           required: true,
+-          fieldName: options.session?.fields?.createdAt || "createdAt"
++          fieldName: options?.session?.fields?.createdAt || "createdAt"
+         },
+         updatedAt: {
+           type: "date",
+           required: true,
+-          fieldName: options.session?.fields?.updatedAt || "updatedAt"
++          fieldName: options?.session?.fields?.updatedAt || "updatedAt"
+         },
+         ipAddress: {
+           type: "string",
+           required: false,
+-          fieldName: options.session?.fields?.ipAddress || "ipAddress"
++          fieldName: options?.session?.fields?.ipAddress || "ipAddress"
+         },
+         userAgent: {
+           type: "string",
+           required: false,
+-          fieldName: options.session?.fields?.userAgent || "userAgent"
++          fieldName: options?.session?.fields?.userAgent || "userAgent"
+         },
+         userId: {
+           type: "string",
+-          fieldName: options.session?.fields?.userId || "userId",
++          fieldName: options?.session?.fields?.userId || "userId",
+           references: {
+-            model: options.user?.modelName || "user",
++            model: options?.user?.modelName || "user",
+             field: "id",
+             onDelete: "cascade"
+           },
+           required: true
+         },
+         ...session?.fields,
+-        ...options.session?.additionalFields
++        ...options?.session?.additionalFields
+       },
+       order: 2
+     }
+   };
+   return {
+     user: {
+-      modelName: options.user?.modelName || "user",
++      modelName: options?.user?.modelName || "user",
+       fields: {
+         name: {
+           type: "string",
+           required: true,
+-          fieldName: options.user?.fields?.name || "name",
++          fieldName: options?.user?.fields?.name || "name",
+           sortable: true
+         },
+         email: {
+           type: "string",
+           unique: true,
+           required: true,
+-          fieldName: options.user?.fields?.email || "email",
++          fieldName: options?.user?.fields?.email || "email",
+           sortable: true
+         },
+         emailVerified: {
+           type: "boolean",
+           defaultValue: () => false,
+           required: true,
+-          fieldName: options.user?.fields?.emailVerified || "emailVerified"
++          fieldName: options?.user?.fields?.emailVerified || "emailVerified"
+         },
+         image: {
+           type: "string",
+           required: false,
+-          fieldName: options.user?.fields?.image || "image"
++          fieldName: options?.user?.fields?.image || "image"
+         },
+         createdAt: {
+           type: "date",
+           defaultValue: () => /* @__PURE__ */ new Date(),
+           required: true,
+-          fieldName: options.user?.fields?.createdAt || "createdAt"
++          fieldName: options?.user?.fields?.createdAt || "createdAt"
+         },
+         updatedAt: {
+           type: "date",
+           defaultValue: () => /* @__PURE__ */ new Date(),
+           required: true,
+-          fieldName: options.user?.fields?.updatedAt || "updatedAt"
++          fieldName: options?.user?.fields?.updatedAt || "updatedAt"
+         },
+         ...user?.fields,
+-        ...options.user?.additionalFields
++        ...options?.user?.additionalFields
+       },
+       order: 1
+     },
+     //only add session table if it's not stored in secondary storage
+-    ...!options.secondaryStorage || options.session?.storeSessionInDatabase ? sessionTable : {},
++    ...!options?.secondaryStorage || options?.session?.storeSessionInDatabase ? sessionTable : {},
+     account: {
+-      modelName: options.account?.modelName || "account",
++      modelName: options?.account?.modelName || "account",
+       fields: {
+         accountId: {
+           type: "string",
+           required: true,
+-          fieldName: options.account?.fields?.accountId || "accountId"
++          fieldName: options?.account?.fields?.accountId || "accountId"
+         },
+         providerId: {
+           type: "string",
+           required: true,
+-          fieldName: options.account?.fields?.providerId || "providerId"
++          fieldName: options?.account?.fields?.providerId || "providerId"
+         },
+         userId: {
+           type: "string",
+           references: {
+-            model: options.user?.modelName || "user",
++            model: options?.user?.modelName || "user",
+             field: "id",
+             onDelete: "cascade"
+           },
+           required: true,
+-          fieldName: options.account?.fields?.userId || "userId"
++          fieldName: options?.account?.fields?.userId || "userId"
+         },
+         accessToken: {
+           type: "string",
+           required: false,
+-          fieldName: options.account?.fields?.accessToken || "accessToken"
++          fieldName: options?.account?.fields?.accessToken || "accessToken"
+         },
+         refreshToken: {
+           type: "string",
+           required: false,
+-          fieldName: options.account?.fields?.refreshToken || "refreshToken"
++          fieldName: options?.account?.fields?.refreshToken || "refreshToken"
+         },
+         idToken: {
+           type: "string",
+           required: false,
+-          fieldName: options.account?.fields?.idToken || "idToken"
++          fieldName: options?.account?.fields?.idToken || "idToken"
+         },
+         accessTokenExpiresAt: {
+           type: "date",
+           required: false,
+-          fieldName: options.account?.fields?.accessTokenExpiresAt || "accessTokenExpiresAt"
++          fieldName: options?.account?.fields?.accessTokenExpiresAt || "accessTokenExpiresAt"
+         },
+         refreshTokenExpiresAt: {
+           type: "date",
+           required: false,
+-          fieldName: options.account?.fields?.accessTokenExpiresAt || "refreshTokenExpiresAt"
++          fieldName: options?.account?.fields?.accessTokenExpiresAt || "refreshTokenExpiresAt"
+         },
+         scope: {
+           type: "string",
+           required: false,
+-          fieldName: options.account?.fields?.scope || "scope"
++          fieldName: options?.account?.fields?.scope || "scope"
+         },
+         password: {
+           type: "string",
+           required: false,
+-          fieldName: options.account?.fields?.password || "password"
++          fieldName: options?.account?.fields?.password || "password"
+         },
+         createdAt: {
+           type: "date",
+           required: true,
+-          fieldName: options.account?.fields?.createdAt || "createdAt"
++          fieldName: options?.account?.fields?.createdAt || "createdAt"
+         },
+         updatedAt: {
+           type: "date",
+           required: true,
+-          fieldName: options.account?.fields?.updatedAt || "updatedAt"
++          fieldName: options?.account?.fields?.updatedAt || "updatedAt"
+         },
+         ...account?.fields
+       },
+       order: 3
+     },
+     verification: {
+-      modelName: options.verification?.modelName || "verification",
++      modelName: options?.verification?.modelName || "verification",
+       fields: {
+         identifier: {
+           type: "string",
+           required: true,
+-          fieldName: options.verification?.fields?.identifier || "identifier"
++          fieldName: options?.verification?.fields?.identifier || "identifier"
+         },
+         value: {
+           type: "string",
+           required: true,
+-          fieldName: options.verification?.fields?.value || "value"
++          fieldName: options?.verification?.fields?.value || "value"
+         },
+         expiresAt: {
+           type: "date",
+           required: true,
+-          fieldName: options.verification?.fields?.expiresAt || "expiresAt"
++          fieldName: options?.verification?.fields?.expiresAt || "expiresAt"
+         },
+         createdAt: {
+           type: "date",
+           required: false,
+           defaultValue: () => /* @__PURE__ */ new Date(),
+-          fieldName: options.verification?.fields?.createdAt || "createdAt"
++          fieldName: options?.verification?.fields?.createdAt || "createdAt"
+         },
+         updatedAt: {
+           type: "date",
+           required: false,
+           defaultValue: () => /* @__PURE__ */ new Date(),
+-          fieldName: options.verification?.fields?.updatedAt || "updatedAt"
++          fieldName: options?.verification?.fields?.updatedAt || "updatedAt"
+         }
+       },
+       order: 4
